@@ -71,22 +71,34 @@
   <div id="loading">
     <img src="assets/daliola_logo.jpg" alt="Daliola Logo">
   </div>
-
   <!-- 🧠 Flutter App -->
   <script>
-    window.addEventListener('load', function(ev) {
-      const script = document.createElement('script');
-      script.src = 'flutter_bootstrap.js';
-      script.async = true;
-      document.body.appendChild(script);
+    const loader = document.getElementById('loading');
 
-      // إزالة شاشة التحميل بعد بدء التطبيق
-      script.addEventListener('load', function() {
-        setTimeout(() => {
-          document.getElementById('loading')?.remove();
-        }, 800);
-      });
-    });
+    // نحمل سكربت Flutter أولاً
+    const script = document.createElement('script');
+    script.src = 'flutter_bootstrap.js';
+    script.async = true;
+
+    script.onload = () => {
+      // بعد تحميل سكربت Flutter بالكامل، نبدأ تشغيل التطبيق
+      if (window._flutter && window._flutter.loader) {
+        window._flutter.loader.loadEntrypoint().then(engineInitializer => {
+          engineInitializer.initializeEngine().then(appRunner => {
+            appRunner.runApp();
+            // نشيل شاشة التحميل بعد تشغيل التطبيق مباشرة
+            setTimeout(() => loader?.remove(), 800);
+          });
+        });
+      } else {
+        // fallback لو حصل تأخير أو خطأ
+        loader?.remove();
+      }
+    };
+
+    document.body.appendChild(script);
   </script>
+
 </body>
 </html>
+
